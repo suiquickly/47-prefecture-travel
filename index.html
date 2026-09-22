@@ -46,21 +46,216 @@ const P=[
 const key=p=>p[1], state=JSON.parse(localStorage.getItem("sui47")||"{}");
 function save(){localStorage.setItem("sui47",JSON.stringify(state));render()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function info(k){return state[k] ||= {visits:[],notes:"",todos:[],media:[]}}
+function info(k){
+  return state[k] ||= {
+    visits:[],
+    notes:"",
+    places:[],
+    foods:[],
+    todos:[],
+    media:[]
+  }
+}
 function visited(k){return info(k).visits.length>0}
 function openPref(k){
  const p=P.find(x=>x[1]===k), d=info(k);
+
  document.getElementById("modalBody").innerHTML=`
- <div class="between"><div><h2>${p[0]}</h2><span class="badge ${visited(k)?"visited":""}">${visited(k)?"訪問済み":"未訪問"}</span></div><button class="secondary" onclick="closeModal()">閉じる</button></div>
- <div class="card"><h3>旅の記録</h3><label>訪問日</label><input id="vdate" type="date" value="${d.visits[0]||""}">
- <div style="height:8px"></div><button onclick="markVisit('${k}')">訪問済みにする</button>
- <div style="height:8px"></div><label>旅のメモ</label><textarea id="note">${esc(d.notes)}</textarea><button onclick="saveNote('${k}')">保存</button></div>
- <div class="card"><h3>TODORIST</h3><div id="todos">${d.todos.map((t,i)=>`<div class="todoitem"><input type="checkbox" ${t.done?"checked":""} onchange="toggleTodo('${k}',${i})"><span style="flex:1;${t.done?"text-decoration:line-through;color:#999":""}">${esc(t.text)}</span><button class="danger" onclick="delTodo('${k}',${i})">×</button></div>`).join("")||"<p class='muted'>まだありません</p>"}</div>
- <div class="row"><input id="newtodo" placeholder="例：〇〇を食べる・〇〇へ行く"><button onclick="addTodo('${k}')">追加</button></div></div>
- <div class="card"><h3>写真・動画</h3><input id="files" type="file" accept="image/*,video/*" multiple onchange="addMedia('${k}')"><div class="media" id="med">${d.media.map((m,i)=>m.type.startsWith("video")?`<video controls src="${m.data}"></video>`:`<img src="${m.data}">`).join("")}</div><p class="muted">※この版ではブラウザ内に保存します。大量の動画保存にはクラウド版がおすすめ。</p></div>`;
+ <div class="between">
+   <div>
+     <h2>${p[0]}</h2>
+     <span class="badge ${visited(k)?"visited":""}">
+       ${visited(k)?"訪問済み":"未訪問"}
+     </span>
+   </div>
+   <button class="secondary" onclick="closeModal()">閉じる</button>
+ </div>
+
+ <div class="card">
+   <h3>📅 旅の日付</h3>
+
+   <label>訪問日</label>
+   <input id="vdate" type="date" value="${d.visits[0]||""}">
+
+   <div style="height:8px"></div>
+
+   <button onclick="markVisit('${k}')">
+     ${visited(k)?"訪問日を更新":"訪問済みにする"}
+   </button>
+ </div>
+
+ <div class="card">
+   <h3>📍 訪れた場所</h3>
+
+   <div id="places">
+     ${
+       d.places.map((x,i)=>`
+       <div class="todoitem">
+         <span style="flex:1">📍 ${esc(x)}</span>
+         <button class="danger" onclick="deletePlace('${k}',${i})">×</button>
+       </div>
+       `).join("")
+       || "<p class='muted'>まだ登録されていません</p>"
+     }
+   </div>
+
+   <div class="row">
+     <input id="newplace" placeholder="例：大阪城">
+     <button onclick="addPlace('${k}')">追加</button>
+   </div>
+ </div>
+
+ <div class="card">
+   <h3>🍴 食べたもの</h3>
+
+   <div id="foods">
+     ${
+       d.foods.map((x,i)=>`
+       <div class="todoitem">
+         <span style="flex:1">🍴 ${esc(x)}</span>
+         <button class="danger" onclick="deleteFood('${k}',${i})">×</button>
+       </div>
+       `).join("")
+       || "<p class='muted'>まだ登録されていません</p>"
+     }
+   </div>
+
+   <div class="row">
+     <input id="newfood" placeholder="例：たこ焼き">
+     <button onclick="addFood('${k}')">追加</button>
+   </div>
+ </div>
+
+ <div class="card">
+   <h3>📝 旅のメモ</h3>
+
+   <textarea id="note" placeholder="この旅で感じたこと、思い出など">${esc(d.notes)}</textarea>
+
+   <button onclick="saveNote('${k}')">
+     メモを保存
+   </button>
+ </div>
+
+ <div class="card">
+   <h3>⭐ また行きたい場所</h3>
+
+   <div id="todos">
+     ${
+       d.todos.map((t,i)=>`
+       <div class="todoitem">
+
+         <input
+           type="checkbox"
+           ${t.done?"checked":""}
+           onchange="toggleTodo('${k}',${i})"
+         >
+
+         <span style="flex:1;${t.done?"text-decoration:line-through;color:#999":""}">
+           ${esc(t.text)}
+         </span>
+
+         <button
+           class="danger"
+           onclick="delTodo('${k}',${i})">
+           ×
+         </button>
+
+       </div>
+       `).join("")
+       || "<p class='muted'>まだありません</p>"
+     }
+   </div>
+
+   <div class="row">
+     <input
+       id="newtodo"
+       placeholder="例：海遊館・箕面の滝"
+     >
+     <button onclick="addTodo('${k}')">
+       追加
+     </button>
+   </div>
+ </div>
+
+ <div class="card">
+   <h3>📸 写真・動画</h3>
+
+   <input
+     id="files"
+     type="file"
+     accept="image/*,video/*"
+     multiple
+     onchange="addMedia('${k}')"
+   >
+
+   <div class="media" id="med">
+     ${
+       d.media.map((m,i)=>
+         m.type.startsWith("video")
+         ? `<video controls src="${m.data}"></video>`
+         : `<img src="${m.data}">`
+       ).join("")
+     }
+   </div>
+
+   <p class="muted">
+     ※現在はブラウザ内に保存しています。
+   </p>
+ </div>
+
+ <div class="card">
+   <h3>🤖 Chappy</h3>
+
+   <p class="muted">
+     この県の旅記録をもとにSNS投稿を作ります。
+   </p>
+
+   <button onclick="closeModal();tab='chappy';render();">
+     ✨ Chappyで旅をまとめる
+   </button>
+ </div>
+ `;
+
  document.getElementById("modal").style.display="block";
 }
+
+}
 function closeModal(){document.getElementById("modal").style.display="none"}
+function addPlace(k){
+  const x=document.getElementById("newplace").value.trim();
+
+  if(!x)return;
+
+  info(k).places.push(x);
+
+  save();
+  openPref(k);
+}
+
+function deletePlace(k,i){
+  info(k).places.splice(i,1);
+
+  save();
+  openPref(k);
+}
+
+function addFood(k){
+  const x=document.getElementById("newfood").value.trim();
+
+  if(!x)return;
+
+  info(k).foods.push(x);
+
+  save();
+  openPref(k);
+}
+
+function deleteFood(k,i){
+  info(k).foods.splice(i,1);
+
+  save();
+  openPref(k);
+}
 function markVisit(k){let d=info(k),v=document.getElementById("vdate").value;if(v&&!d.visits.includes(v))d.visits.push(v);else if(!d.visits.length)d.visits.push(new Date().toISOString().slice(0,10));save();openPref(k)}
 function saveNote(k){info(k).notes=document.getElementById("note").value;save();openPref(k)}
 function addTodo(k){let x=document.getElementById("newtodo").value.trim();if(x){info(k).todos.push({text:x,done:false});save();openPref(k)}}
