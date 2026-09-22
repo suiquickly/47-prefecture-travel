@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.webmanifest">
+<title>SUI 47 Journey</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f5f7fb;color:#111827}
+header{position:sticky;top:0;z-index:5;background:#111827;color:white;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+h1,h2,h3,p{margin:0 0 8px}.wrap{max-width:900px;margin:auto;padding:16px 16px 88px}.muted{color:#6b7280;font-size:13px}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e5e7eb;display:flex;z-index:10}.tabs button{flex:1;border:0;background:white;padding:12px 4px;font-size:11px}.tabs button.active{font-weight:700;color:#2563eb}
+.card{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #00000008}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:650px){.grid{grid-template-columns:repeat(4,1fr)}}
+button,.btn{border:0;border-radius:12px;padding:10px 13px;background:#111827;color:white;font-weight:600;cursor:pointer}.secondary{background:#eef2ff;color:#3730a3}.danger{background:#fee2e2;color:#991b1b}
+input,textarea,select{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px;background:white;font:inherit}textarea{min-height:120px}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;background:#eef2ff;color:#3730a3}.visited{background:#dcfce7;color:#166534}.todo{background:#fef3c7;color:#92400e}
+.map{position:relative;min-height:520px;background:linear-gradient(#dbeafe,#eff6ff);border-radius:22px;overflow:hidden;border:1px solid #bfdbfe}
+.pref{position:absolute;min-width:68px;padding:8px 5px;border-radius:12px;background:#fff;border:2px solid #cbd5e1;box-shadow:0 3px 10px #0002;font-size:11px;text-align:center}
+.pref.visited{border-color:#22c55e;background:#f0fdf4}.pref.hasTodo{border-color:#f59e0b;background:#fffbeb}
+.media{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.media img,.media video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#e5e7eb}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.todoitem{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.todoitem:last-child{border:0}
+#modal{position:fixed;inset:0;background:#0008;z-index:20;display:none;padding:18px;overflow:auto}.modalbox{max-width:760px;margin:30px auto;background:#f8fafc;border-radius:20px;padding:18px}
+pre.output{white-space:pre-wrap;background:#111827;color:#f9fafb;padding:14px;border-radius:14px;font-size:13px}
+.stat{font-size:28px;font-weight:800}.hero{background:linear-gradient(135deg,#111827,#334155);color:white}
+</style>
+</head>
+<body>
+<header><div><strong>SUI 47 Journey</strong><div class="muted" style="color:#cbd5e1">47都道府県・旅の記録OS</div></div><span id="count">0 / 47</span></header>
+<main id="app" class="wrap"></main>
+<nav class="tabs">
+<button data-tab="map">🗾<br>MAP</button><button data-tab="todo">📌<br>TODORIST</button><button data-tab="album">📷<br>ALBUM</button><button data-tab="chappy">✨<br>CHAPPY</button><button data-tab="data">💾<br>DATA</button>
+</nav>
+<div id="modal"><div class="modalbox" id="modalBody"></div></div>
+<script>
+const P=[
+["北海道","hokkaido",25,4],["青森","aomori",31,13],["岩手","iwate",38,18],["宮城","miyagi",45,25],["秋田","akita",31,25],["山形","yamagata",38,32],["福島","fukushima",46,39],
+["茨城","ibaraki",56,48],["栃木","tochigi",51,45],["群馬","gunma",46,47],["埼玉","saitama",50,53],["千葉","chiba",60,55],["東京","tokyo",53,57],["神奈川","kanagawa",49,61],
+["新潟","niigata",39,39],["富山","toyama",34,47],["石川","ishikawa",29,48],["福井","fukui",29,55],["長野","nagano",40,54],["岐阜","gifu",34,61],["山梨","yamanashi",44,60],["静岡","shizuoka",48,67],["愛知","aichi",37,68],
+["三重","mie",33,76],["滋賀","shiga",28,67],["京都","kyoto",25,64],["大阪","osaka",22,70],["兵庫","hyogo",18,64],["奈良","nara",27,73],["和歌山","wakayama",21,79],
+["鳥取","tottori",12,60],["島根","shimane",7,61],["岡山","okayama",15,69],["広島","hiroshima",8,72],["山口","yamaguchi",2,74],["徳島","tokushima",17,78],["香川","kagawa",13,75],["愛媛","ehime",7,79],["高知","kochi",8,85],
+["福岡","fukuoka",2,85],["佐賀","saga",5,83],["長崎","nagasaki",1,88],["熊本","kumamoto",2,93],["大分","oita",7,91],["宮崎","miyazaki",8,97],["鹿児島","kagoshima",3,101],["沖縄","okinawa",18,103]
+];
+const key=p=>p[1], state=JSON.parse(localStorage.getItem("sui47")||"{}");
+function save(){localStorage.setItem("sui47",JSON.stringify(state));render()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function info(k){return state[k] ||= {visits:[],notes:"",todos:[],media:[]}}
+function visited(k){return info(k).visits.length>0}
+function openPref(k){
+ const p=P.find(x=>x[1]===k), d=info(k);
+ document.getElementById("modalBody").innerHTML=`
+ <div class="between"><div><h2>${p[0]}</h2><span class="badge ${visited(k)?"visited":""}">${visited(k)?"訪問済み":"未訪問"}</span></div><button class="secondary" onclick="closeModal()">閉じる</button></div>
+ <div class="card"><h3>旅の記録</h3><label>訪問日</label><input id="vdate" type="date" value="${d.visits[0]||""}">
+ <div style="height:8px"></div><button onclick="markVisit('${k}')">訪問済みにする</button>
+ <div style="height:8px"></div><label>旅のメモ</label><textarea id="note">${esc(d.notes)}</textarea><button onclick="saveNote('${k}')">保存</button></div>
+ <div class="card"><h3>TODORIST</h3><div id="todos">${d.todos.map((t,i)=>`<div class="todoitem"><input type="checkbox" ${t.done?"checked":""} onchange="toggleTodo('${k}',${i})"><span style="flex:1;${t.done?"text-decoration:line-through;color:#999":""}">${esc(t.text)}</span><button class="danger" onclick="delTodo('${k}',${i})">×</button></div>`).join("")||"<p class='muted'>まだありません</p>"}</div>
+ <div class="row"><input id="newtodo" placeholder="例：〇〇を食べる・〇〇へ行く"><button onclick="addTodo('${k}')">追加</button></div></div>
+ <div class="card"><h3>写真・動画</h3><input id="files" type="file" accept="image/*,video/*" multiple onchange="addMedia('${k}')"><div class="media" id="med">${d.media.map((m,i)=>m.type.startsWith("video")?`<video controls src="${m.data}"></video>`:`<img src="${m.data}">`).join("")}</div><p class="muted">※この版ではブラウザ内に保存します。大量の動画保存にはクラウド版がおすすめ。</p></div>`;
+ document.getElementById("modal").style.display="block";
+}
+function closeModal(){document.getElementById("modal").style.display="none"}
+function markVisit(k){let d=info(k),v=document.getElementById("vdate").value;if(v&&!d.visits.includes(v))d.visits.push(v);else if(!d.visits.length)d.visits.push(new Date().toISOString().slice(0,10));save();openPref(k)}
+function saveNote(k){info(k).notes=document.getElementById("note").value;save();openPref(k)}
+function addTodo(k){let x=document.getElementById("newtodo").value.trim();if(x){info(k).todos.push({text:x,done:false});save();openPref(k)}}
+function toggleTodo(k,i){info(k).todos[i].done=!info(k).todos[i].done;save();openPref(k)}
+function delTodo(k,i){info(k).todos.splice(i,1);save();openPref(k)}
+function addMedia(k){const fs=[...document.getElementById("files").files];Promise.all(fs.map(f=>new Promise(r=>{const rd=new FileReader();rd.onload=()=>r({type:f.type,data:rd.result,name:f.name});rd.readAsDataURL(f)}))).then(a=>{info(k).media.push(...a);save();openPref(k)})}
+let tab="map";
+function render(){
+ const n=P.filter(x=>visited(x[1])).length;document.getElementById("count").textContent=`${n} / 47`;
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+ const app=document.getElementById("app");
+ if(tab==="map")renderMap(app); if(tab==="todo")renderTodo(app); if(tab==="album")renderAlbum(app); if(tab==="chappy")renderChappy(app); if(tab==="data")renderData(app);
+}
+function renderMap(a){
+ a.innerHTML=`<div class="card hero"><div class="stat">${P.filter(x=>visited(x[1])).length} / 47</div><p>訪問した都道府県</p><p class="muted" style="color:#cbd5e1">タップして旅を記録。緑＝訪問済み、黄＝TODOあり。</p></div>
+ <div class="map">${P.map(p=>{let d=info(p[1]),cl=visited(p[1])?"visited":d.todos.length?"hasTodo":"";return `<button class="pref ${cl}" style="left:${p[2]}%;top:${p[3]}%" onclick="openPref('${p[1]}')">${p[0]}</button>`}).join("")}</div>
+ <div class="card"><h3>旅の進捗</h3><div class="grid">${P.map(p=>`<button class="secondary" onclick="openPref('${p[1]}')">${p[0]} ${visited(p[1])?"✓":""}</button>`).join("")}</div></div>`;
+}
+function renderTodo(a){
+ let items=[];P.forEach(p=>info(p[1]).todos.forEach((t,i)=>items.push({p,i,t,k:p[1]})));
+ a.innerHTML=`<h2>TODORIST</h2><p class="muted">「訪問済み＝完了」ではなく、また行きたい場所・やりたいことを残します。</p>
+ <div class="card">${items.map(x=>`<div class="todoitem"><input type="checkbox" ${x.t.done?"checked":""} onchange="toggleTodo('${x.k}',${x.i})"><span style="flex:1"><b>${x.p[0]}</b>　${esc(x.t.text)}</span><button class="secondary" onclick="openPref('${x.k}')">県へ</button></div>`).join("")||"<p>TODOはまだありません。MAPから追加できます。</p>"}</div>`;
+}
+function allMedia(){let a=[];P.forEach(p=>info(p[1]).media.forEach(m=>a.push({...m,p:p[0]})));return a}
+function renderAlbum(a){let ms=allMedia();a.innerHTML=`<h2>ALBUM</h2><p class="muted">${ms.length}件のメディア</p><div class="media card">${ms.map(m=>m.type.startsWith("video")?`<video controls src="${m.data}"></video>`:`<img src="${m.data}" title="${m.p}">`).join("")||"<p>まだ写真・動画がありません。各県ページから追加できます。</p>"}</div>`}
+function renderChappy(a){
+ let recent=P.filter(p=>visited(p[1])).slice(-1)[0]?.[1]||"";
+ a.innerHTML=`<h2>✨ CHAPPY</h2><p class="muted">保存した旅の記録から、SNS用の振り返りを作るための編集アシスタント。</p>
+ <div class="card"><label>対象</label><select id="target"><option value="all">これまでの旅</option>${P.filter(p=>visited(p[1])).map(p=>`<option value="${p[1]}" ${p[1]===recent?"selected":""}>${p[0]}</option>`).join("")}</select><button style="margin-top:10px" onclick="makeChappy()">旅を振り返る</button></div><div id="chappyout"></div>`;
+}
+function makeChappy(){
+ let k=document.getElementById("target").value, ps=k==="all"?P:P.filter(p=>p[1]===k), notes=[], media=[], todos=[];
+ ps.forEach(p=>{let d=info(p[1]);if(d.notes)notes.push(`${p[0]}：${d.notes}`);media.push(...d.media.map((m,i)=>({p:p[0],i,name:m.name,type:m.type})));});
+ let title=k==="all"?"47都道府県の旅記録":ps[0][0]+"旅";
+ let body=notes.join("\n")||"旅のメモはまだありません。";
+ let picks=media.slice(0,6).map((m,i)=>`${i+1}. ${m.p} / ${m.name||"media"}（${m.type.startsWith("video")?"動画":"写真"}）`).join("\n")||"写真・動画を追加すると候補を表示します。";
+ document.getElementById("chappyout").innerHTML=`<div class="card"><h3>① 旅の振り返り</h3><pre class="output">${esc(title+"\\n\\n"+body)}</pre></div>
+ <div class="card"><h3>② Instagram投稿文</h3><pre class="output">${esc("📍 "+title+"\\n\\n今回の旅で出会った景色、食べたもの、感じたこと。\\n\\n"+body+"\\n\\n次はどこへ行こう。47都道府県の旅、まだまだ続く。\\n\\n#47都道府県 #一人旅 #日本旅行 #旅の記録")}</pre></div>
+ <div class="card"><h3>③ Reel構成</h3><pre class="output">${esc("0-2秒：旅先を決めるルーレット／タイトル\\n2-5秒：移動・到着カット\\n5-12秒：一番印象的な景色\\n12-18秒：食・体験\\n18-25秒：自分の視点が伝わるカット\\n25-30秒：余韻＋「次はどこへ？」\\n\\n候補メディア:\\n"+picks)}</pre></div>
+ <div class="card"><h3>④ TikTok用</h3><pre class="output">${esc(title+"。今回はこんな旅をしてきました。\\n"+body+"\\n#一人旅 #旅行 #日本一周 #47都道府県")}</pre></div>`;
+}
+function renderData(a){
+ a.innerHTML=`<h2>DATA</h2><div class="card"><h3>バックアップ</h3><p class="muted">旅の記録・TODO・訪問状況をJSONで保存できます。</p><button onclick="exportData()">JSONを書き出す</button><div style="height:12px"></div><input type="file" accept=".json" onchange="importData(this)"></div>
+ <div class="card"><h3>現在の保存方式</h3><p>この版はブラウザのlocalStorageを利用します。端末やブラウザを変える前にJSONバックアップを取ってください。</p><button class="danger" onclick="if(confirm('全データを削除します。よろしいですか？')){localStorage.removeItem('sui47');location.reload()}">全データ削除</button></div>`;
+}
+function exportData(){let b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="sui47-backup.json";a.click();URL.revokeObjectURL(u)}
+function importData(el){let f=el.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{localStorage.setItem("sui47",r.result);location.reload()}catch(e){alert("読み込みに失敗しました")}};r.readAsText(f)}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+render();
+</script>
+</body></html>

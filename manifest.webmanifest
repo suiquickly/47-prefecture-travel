@@ -1,0 +1,9 @@
+{
+  "name":"SUI 47 Journey",
+  "short_name":"SUI47",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f5f7fb",
+  "theme_color":"#111827",
+  "lang":"ja"
+}
