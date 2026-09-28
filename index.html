@@ -466,9 +466,9 @@ function renderTodo(a){
               onchange="toggleTodo('${x.k}',${x.i})"
             >
 
-            <span style="flex:1">
-              <b>${x.p[0]}</b>　${esc(x.t.text)}
-            </span>
+           <span style="flex:1;min-width:0;text-align:left;display:block;white-space:normal;word-break:break-word;">
+           <b>${x.p[0]}</b>　${esc(x.t.text)}
+           </span>
 
             <button
               class="secondary"
@@ -493,9 +493,9 @@ function renderTodo(a){
               onchange="toggleTodo('${x.k}',${x.i})"
             >
 
-            <span style="flex:1;text-decoration:line-through;color:#999">
-              <b>${x.p[0]}</b>　${esc(x.t.text)}
-            </span>
+           <span style="flex:1;min-width:0;text-align:left;display:block;white-space:normal;word-break:break-word;">
+            <b>${x.p[0]}</b>　${esc(x.t.text)}
+           </span>
 
             <button
               class="secondary"
