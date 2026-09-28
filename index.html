@@ -394,7 +394,7 @@ function makeChappy(){
         p:p[0],
         i,
         name:m.name,
-        type:m.type
+        type:m.type,
         category:m.category
       }))
     );
@@ -411,38 +411,67 @@ function makeChappy(){
 let photos=media.filter(m=>!m.type.startsWith("video"));
 let videos=media.filter(m=>m.type.startsWith("video"));
 
-let picks=
-"🎬 Reel素材候補\n\n"+
-"🌄 景色\n"+
-(media.filter(m=>m.category==="景色").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。")+
-"\n\n"+
-"🍴 食べ物\n"+
-(media.filter(m=>m.category==="食べ物").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。")+
-"\n\n"+
-"🏙️ 街歩き\n"+
-(media.filter(m=>m.category==="街歩き").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。")+
-"\n\n"+
-"🏛️ 建物\n"+
-(media.filter(m=>m.category==="建物").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。")+
-"\n\n"+
-"👤 人・自分\n"+
-(media.filter(m=>m.category==="人・自分").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。")+
-"\n\n"+
-"📦 その他\n"+
-(media.filter(m=>m.category==="その他").slice(0,2)
-  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
-  .join("\n") || "まだありません。");
+let scenery=media.filter(m=>m.category==="景色");
+let foodMedia=media.filter(m=>m.category==="食べ物");
+let street=media.filter(m=>m.category==="街歩き");
+let building=media.filter(m=>m.category==="建物");
+let people=media.filter(m=>m.category==="人・自分");
 
+let picks=
+"🎬 Reel素材のおすすめ\n\n"+
+
+"0-2秒｜つかみ\n"+
+"🎰 旅先ルーレット\n"+
+"→ ルーレット動画を使用\n\n"+
+
+"2-5秒｜旅のスタート\n"+
+"🏙️ 街歩き\n"+
+(street.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "→ 街歩き素材がありません。")+
+"\n\n"+
+
+"5-10秒｜今回の旅の主役\n"+
+"🌄 景色・🏛️ 建物\n"+
+(scenery.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") ||
+ building.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") ||
+ "→ 景色・建物素材がありません。")+
+"\n\n"+
+
+"10-15秒｜食・体験\n"+
+"🍴 食べ物\n"+
+(foodMedia.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "→ 食べ物素材がありません。")+
+"\n\n"+
+
+"15-23秒｜旅の空気感\n"+
+"🏙️ 街歩き\n"+
+(street.slice(0,2)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "→ 街歩き素材がありません。")+
+"\n\n"+
+
+"23-27秒｜思い出\n"+
+"👤 人・自分\n"+
+(people.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") ||
+ scenery.slice(0,1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") ||
+ "→ 人・自分・景色素材がありません。")+
+"\n\n"+
+
+"27-30秒｜締め\n"+
+"🌄 景色\n"+
+(scenery.slice(-1)
+  .map(m=>`→ ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "→ 景色素材がありません。");
   document.getElementById("chappyout").innerHTML=`
     <div class="card">
       <h3>① 旅の振り返り</h3>
