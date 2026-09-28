@@ -21,7 +21,29 @@ input,textarea,select{width:100%;border:1px solid #d1d5db;border-radius:10px;pad
 .pref.visited{border-color:#22c55e;background:#f0fdf4}.pref.hasTodo{border-color:#f59e0b;background:#fffbeb}
 .media{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.media img,.media video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#e5e7eb}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.todoitem{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.todoitem:last-child{border:0}
+.todoitem{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.todoitem span{
+  flex:1;
+  text-align:left;
+  min-width:0;
+}
+
+.todoitem button{
+  flex-shrink:0;
+}
+
+.todoitem:last-child{
+  border:0;
+}
 #modal{position:fixed;inset:0;background:#0008;z-index:20;display:none;padding:18px;overflow:auto}.modalbox{max-width:760px;margin:30px auto;background:#f8fafc;border-radius:20px;padding:18px}
 pre.output{white-space:pre-wrap;background:#111827;color:#f9fafb;padding:14px;border-radius:14px;font-size:13px}
 .stat{font-size:28px;font-weight:800}.hero{background:linear-gradient(135deg,#111827,#334155);color:white}
