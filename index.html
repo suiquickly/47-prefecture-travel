@@ -344,15 +344,18 @@ title+"\n\n"+
     <div class="card">
       <h3>② Instagram投稿文</h3>
       <pre class="output">${esc(
-        "📍 "+title+"\n\n"+
-        "今回の旅で訪れた場所や食べたものを振り返ります。\n\n"+
-        "📍 "+placeText+"\n\n"+
-        "🍴 "+foodText+"\n\n"+
-        noteText+
-        "\n\n次はどこへ行こう。47都道府県の旅、まだまだ続く。\n\n"+
-        "#47都道府県 #一人旅 #日本旅行 #旅の記録"
-      )}</pre>
-    </div>
+      "📍 "+title+"\n\n"+
+"今回の旅では、"+
+(placeText !== "訪れた場所はまだありません。" ? "「"+placeText.split("：").slice(1).join("、")+"」を巡り、" : "")+
+(foodText !== "食べたものはまだありません。" ? "「"+foodText.split("：").slice(1).join("、")+"」も味わいました。" : "")+
+(noteText !== "旅のメモはまだありません。" ? "\n\n"+noteText : "")+
+"\n\n"+
+"その土地でしか見られない景色や、食べてみたかったものに出会えるのが旅の楽しみ。\n"+
+"今回もまた一つ、思い出が増えました。\n\n"+
+"47都道府県の旅、まだまだ続きます。\n"+
+"次はどこへ行こう？\n\n"+
+"#47都道府県 #一人旅 #日本旅行 #旅の記録 #suisui_lifegram"
+      )}</pre></div>
 
     <div class="card">
       <h3>③ Reel構成</h3>
