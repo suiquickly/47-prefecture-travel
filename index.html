@@ -256,7 +256,23 @@ function deleteFood(k,i){
   save();
   openPref(k);
 }
-function markVisit(k){let d=info(k),v=document.getElementById("vdate").value;if(v&&!d.visits.includes(v))d.visits.push(v);else if(!d.visits.length)d.visits.push(new Date().toISOString().slice(0,10));save();openPref(k)}
+function markVisit(k){
+  const d=info(k);
+  const v=document.getElementById("vdate").value;
+
+  if(d.visits.length){
+    d.visits=[];
+  }else{
+    if(v){
+      d.visits.push(v);
+    }else{
+      d.visits.push(new Date().toISOString().slice(0,10));
+    }
+  }
+
+  save();
+  openPref(k);
+}
 function saveNote(k){info(k).notes=document.getElementById("note").value;save();openPref(k)}
 function addTodo(k){let x=document.getElementById("newtodo").value.trim();if(x){info(k).todos.push({text:x,done:false});save();openPref(k)}}
 function toggleTodo(k,i){info(k).todos[i].done=!info(k).todos[i].done;save();openPref(k)}
