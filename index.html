@@ -287,15 +287,101 @@ function renderChappy(a){
  <div class="card"><label>対象</label><select id="target"><option value="all">これまでの旅</option>${P.filter(p=>visited(p[1])).map(p=>`<option value="${p[1]}" ${p[1]===recent?"selected":""}>${p[0]}</option>`).join("")}</select><button style="margin-top:10px" onclick="makeChappy()">旅を振り返る</button></div><div id="chappyout"></div>`;
 }
 function makeChappy(){
- let k=document.getElementById("target").value, ps=k==="all"?P:P.filter(p=>p[1]===k), notes=[], media=[], todos=[];
- ps.forEach(p=>{let d=info(p[1]);if(d.notes)notes.push(`${p[0]}：${d.notes}`);media.push(...d.media.map((m,i)=>({p:p[0],i,name:m.name,type:m.type})));});
- let title=k==="all"?"47都道府県の旅記録":ps[0][0]+"旅";
- let body=notes.join("\n")||"旅のメモはまだありません。";
- let picks=media.slice(0,6).map((m,i)=>`${i+1}. ${m.p} / ${m.name||"media"}（${m.type.startsWith("video")?"動画":"写真"}）`).join("\n")||"写真・動画を追加すると候補を表示します。";
- document.getElementById("chappyout").innerHTML=`<div class="card"><h3>① 旅の振り返り</h3><pre class="output">${esc(title+"\\n\\n"+body)}</pre></div>
- <div class="card"><h3>② Instagram投稿文</h3><pre class="output">${esc("📍 "+title+"\\n\\n今回の旅で出会った景色、食べたもの、感じたこと。\\n\\n"+body+"\\n\\n次はどこへ行こう。47都道府県の旅、まだまだ続く。\\n\\n#47都道府県 #一人旅 #日本旅行 #旅の記録")}</pre></div>
- <div class="card"><h3>③ Reel構成</h3><pre class="output">${esc("0-2秒：旅先を決めるルーレット／タイトル\\n2-5秒：移動・到着カット\\n5-12秒：一番印象的な景色\\n12-18秒：食・体験\\n18-25秒：自分の視点が伝わるカット\\n25-30秒：余韻＋「次はどこへ？」\\n\\n候補メディア:\\n"+picks)}</pre></div>
- <div class="card"><h3>④ TikTok用</h3><pre class="output">${esc(title+"。今回はこんな旅をしてきました。\\n"+body+"\\n#一人旅 #旅行 #日本一周 #47都道府県")}</pre></div>`;
+  let k=document.getElementById("target").value;
+  let ps=k==="all"?P:P.filter(p=>p[1]===k);
+  let notes=[],places=[],foods=[],media=[];
+
+  ps.forEach(p=>{
+    let d=info(p[1]);
+
+    if(d.notes){
+      notes.push(`${p[0]}：${d.notes}`);
+    }
+
+    d.places.forEach(x=>{
+      places.push(`${p[0]}：${x}`);
+    });
+
+    d.foods.forEach(x=>{
+      foods.push(`${p[0]}：${x}`);
+    });
+
+    media.push(
+      ...d.media.map((m,i)=>({
+        p:p[0],
+        i,
+        name:m.name,
+        type:m.type
+      }))
+    );
+  });
+
+  let title=k==="all"
+    ?"47都道府県の旅記録"
+    :ps[0][0]+"旅";
+
+  let noteText=notes.join("\n")||"旅のメモはまだありません。";
+  let placeText=places.join("\n")||"訪れた場所はまだありません。";
+  let foodText=foods.join("\n")||"食べたものはまだありません。";
+
+  let picks=media.slice(0,6)
+    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"media"}（${m.type.startsWith("video")?"動画":"写真"}）`)
+    .join("\n")
+    ||"写真・動画を追加すると候補を表示します。";
+
+  document.getElementById("chappyout").innerHTML=`
+    <div class="card">
+      <h3>① 旅の振り返り</h3>
+      <pre class="output">${esc(
+        title+"\n\n"+
+        "📍 訪れた場所\n"+
+        placeText+"\n\n"+
+        "🍴 食べたもの\n"+
+        foodText+"\n\n"+
+        "📝 旅のメモ\n"+
+        noteText
+      )}</pre>
+    </div>
+
+    <div class="card">
+      <h3>② Instagram投稿文</h3>
+      <pre class="output">${esc(
+        "📍 "+title+"\n\n"+
+        "今回の旅で訪れた場所や食べたものを振り返ります。\n\n"+
+        "📍 "+placeText+"\n\n"+
+        "🍴 "+foodText+"\n\n"+
+        noteText+
+        "\n\n次はどこへ行こう。47都道府県の旅、まだまだ続く。\n\n"+
+        "#47都道府県 #一人旅 #日本旅行 #旅の記録"
+      )}</pre>
+    </div>
+
+    <div class="card">
+      <h3>③ Reel構成</h3>
+      <pre class="output">${esc(
+        "0-2秒：旅先を決めるルーレット／タイトル\n"+
+        "2-5秒：移動・到着カット\n"+
+        "5-12秒：一番印象的な景色\n"+
+        "12-18秒：食・体験\n"+
+        "18-25秒：自分の視点が伝わるカット\n"+
+        "25-30秒：余韻＋「次はどこへ？」\n\n"+
+        "📍 訪れた場所\n"+placeText+
+        "\n\n🍴 食べたもの\n"+foodText+
+        "\n\n候補メディア:\n"+picks
+      )}</pre>
+    </div>
+
+    <div class="card">
+      <h3>④ TikTok用</h3>
+      <pre class="output">${esc(
+        title+"。今回はこんな旅をしてきました。\n\n"+
+        "📍 "+placeText+"\n"+
+        "🍴 "+foodText+"\n\n"+
+        noteText+
+        "\n\n#一人旅 #旅行 #日本一周 #47都道府県"
+      )}</pre>
+    </div>
+  `;
 }
 function renderData(a){
  a.innerHTML=`<h2>DATA</h2><div class="card"><h3>バックアップ</h3><p class="muted">旅の記録・TODO・訪問状況をJSONで保存できます。</p><button onclick="exportData()">JSONを書き出す</button><div style="height:12px"></div><input type="file" accept=".json" onchange="importData(this)"></div>
