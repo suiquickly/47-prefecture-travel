@@ -375,15 +375,36 @@ let photos=media.filter(m=>!m.type.startsWith("video"));
 let videos=media.filter(m=>m.type.startsWith("video"));
 
 let picks=
-  "📹 動画候補\n"+
-  (videos.slice(0,3)
-    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"動画"}`)
-    .join("\n") || "動画はまだありません。")+
-  "\n\n"+
-  "📸 写真候補\n"+
-  (photos.slice(0,3)
-    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"写真"}`)
-    .join("\n") || "写真はまだありません。");
+"🎬 Reel素材候補\n\n"+
+"🌄 景色\n"+
+(media.filter(m=>m.category==="景色").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。")+
+"\n\n"+
+"🍴 食べ物\n"+
+(media.filter(m=>m.category==="食べ物").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。")+
+"\n\n"+
+"🏙️ 街歩き\n"+
+(media.filter(m=>m.category==="街歩き").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。")+
+"\n\n"+
+"🏛️ 建物\n"+
+(media.filter(m=>m.category==="建物").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。")+
+"\n\n"+
+"👤 人・自分\n"+
+(media.filter(m=>m.category==="人・自分").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。")+
+"\n\n"+
+"📦 その他\n"+
+(media.filter(m=>m.category==="その他").slice(0,2)
+  .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"素材"}`)
+  .join("\n") || "まだありません。");
 
   document.getElementById("chappyout").innerHTML=`
     <div class="card">
