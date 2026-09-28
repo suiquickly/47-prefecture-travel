@@ -261,7 +261,54 @@ function saveNote(k){info(k).notes=document.getElementById("note").value;save();
 function addTodo(k){let x=document.getElementById("newtodo").value.trim();if(x){info(k).todos.push({text:x,done:false});save();openPref(k)}}
 function toggleTodo(k,i){info(k).todos[i].done=!info(k).todos[i].done;save();openPref(k)}
 function delTodo(k,i){info(k).todos.splice(i,1);save();openPref(k)}
-function addMedia(k){const fs=[...document.getElementById("files").files];Promise.all(fs.map(f=>new Promise(r=>{const rd=new FileReader();rd.onload=()=>r({type:f.type,data:rd.result,name:f.name});rd.readAsDataURL(f)}))).then(a=>{info(k).media.push(...a);save();openPref(k)})}
+function addMedia(k){
+  const fs=[...document.getElementById("files").files];
+
+  if(!fs.length)return;
+
+  const category=prompt(
+    "この写真・動画は何の素材？\n\n"+
+    "① 景色\n"+
+    "② 食べ物\n"+
+    "③ 人・自分\n"+
+    "④ 街歩き\n"+
+    "⑤ 建物\n"+
+    "⑥ その他\n\n"+
+    "番号を入力してください"
+  );
+
+  const categories={
+    "1":"景色",
+    "2":"食べ物",
+    "3":"人・自分",
+    "4":"街歩き",
+    "5":"建物",
+    "6":"その他"
+  };
+
+  const selected=categories[category]||"その他";
+
+  Promise.all(
+    fs.map(f=>new Promise(r=>{
+      const rd=new FileReader();
+
+      rd.onload=()=>{
+        r({
+          type:f.type,
+          data:rd.result,
+          name:f.name,
+          category:selected
+        });
+      };
+
+      rd.readAsDataURL(f);
+    }))
+  ).then(a=>{
+    info(k).media.push(...a);
+    save();
+    openPref(k);
+  });
+}
 let tab="map";
 function render(){
  const n=P.filter(x=>visited(x[1])).length;document.getElementById("count").textContent=`${n} / 47`;
