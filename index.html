@@ -324,10 +324,19 @@ function makeChappy(){
   let placeText=places.join("\n")||"訪れた場所はまだありません。";
   let foodText=foods.join("\n")||"食べたものはまだありません。";
 
-  let picks=media.slice(0,6)
-    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"media"}（${m.type.startsWith("video")?"動画":"写真"}）`)
-    .join("\n")
-    ||"写真・動画を追加すると候補を表示します。";
+let photos=media.filter(m=>!m.type.startsWith("video"));
+let videos=media.filter(m=>m.type.startsWith("video"));
+
+let picks=
+  "📹 動画候補\n"+
+  (videos.slice(0,3)
+    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"動画"}`)
+    .join("\n") || "動画はまだありません。")+
+  "\n\n"+
+  "📸 写真候補\n"+
+  (photos.slice(0,3)
+    .map((m,i)=>`${i+1}. ${m.p} / ${m.name||"写真"}`)
+    .join("\n") || "写真はまだありません。");
 
   document.getElementById("chappyout").innerHTML=`
     <div class="card">
