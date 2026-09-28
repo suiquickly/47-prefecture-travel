@@ -275,7 +275,16 @@ function markVisit(k){
 }
 function saveNote(k){info(k).notes=document.getElementById("note").value;save();openPref(k)}
 function addTodo(k){let x=document.getElementById("newtodo").value.trim();if(x){info(k).todos.push({text:x,done:false});save();openPref(k)}}
-function toggleTodo(k,i){info(k).todos[i].done=!info(k).todos[i].done;save();openPref(k)}
+function toggleTodo(k,i){
+  info(k).todos[i].done=!info(k).todos[i].done;
+  save();
+
+  if(tab==="todo"){
+    renderTodo(document.getElementById("app"));
+  }else{
+    openPref(k);
+  }
+}
 function delTodo(k,i){info(k).todos.splice(i,1);save();openPref(k)}
 function addMedia(k){
   const fs=[...document.getElementById("files").files];
