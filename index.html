@@ -335,8 +335,8 @@ function addMedia(k){
         }))
       ).then(a=>{
         info(k).media.push(...a);
+        box.remove();       
         save();
-        box.remove();
         openPref(k);
       });
     };
