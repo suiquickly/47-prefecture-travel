@@ -335,10 +335,10 @@ function makeChappy(){
       <pre class="output">${esc(
 title+"\n\n"+
 "今回の旅では、"+
-(placeText !== "訪れた場所はまだありません。" ? placeText+"を訪れ、" : "")+
-(foodText !== "食べたものはまだありません。" ? foodText+"を味わい、" : "")+
-(noteText !== "旅のメモはまだありません。" ? noteText : "旅の思い出を記録しました。")+
-"\n\n今回の旅で感じたことや印象に残った出来事を振り返りながら、次の旅へつながる記録として残しておきましょう。"
+(placeText !== "訪れた場所はまだありません。" ? "「"+placeText.split("：").slice(1).join("、")+"」を訪れ、" : "")+
+(foodText !== "食べたものはまだありません。" ? "「"+foodText.split("：").slice(1).join("、")+"」を味わいました。" : "")+
+(noteText !== "旅のメモはまだありません。" ? "\n\n"+noteText : "")+
+"\n\n今回の旅で感じたことや印象に残った出来事を振り返りながら、次の旅へつながる記録として残していきましょう。"
       )}</pre></div>
 
     <div class="card">
