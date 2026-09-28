@@ -346,11 +346,39 @@ function addMedia(k){
   document.body.appendChild(box);
 }
 let tab="map";
+  function getProgress(){
+  const total=P.length;
+
+  const visitedCount=P.filter(p=>{
+    return visited(p[1]);
+  }).length;
+
+  const percent=Math.round((visitedCount/total)*100);
+
+  return {
+    visitedCount,
+    total,
+    percent
+  };
+}
 function render(){
- const n=P.filter(x=>visited(x[1])).length;document.getElementById("count").textContent=`${n} / 47`;
- document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
- const app=document.getElementById("app");
- if(tab==="map")renderMap(app); if(tab==="todo")renderTodo(app); if(tab==="album")renderAlbum(app); if(tab==="chappy")renderChappy(app); if(tab==="data")renderData(app);
+  const n=P.filter(x=>visited(x[1])).length;
+  const percent=Math.round((n/P.length)*100);
+
+  document.getElementById("count").textContent=
+    `${n} / ${P.length}　(${percent}%)`;
+
+  document.querySelectorAll(".tabs button").forEach(b=>{
+    b.classList.toggle("active",b.dataset.tab===tab);
+  });
+
+  const app=document.getElementById("app");
+
+  if(tab==="map")renderMap(app);
+  if(tab==="todo")renderTodo(app);
+  if(tab==="album")renderAlbum(app);
+  if(tab==="chappy")renderChappy(app);
+  if(tab==="data")renderData(app);
 }
 function renderMap(a){
  a.innerHTML=`<div class="card hero"><div class="stat">${P.filter(x=>visited(x[1])).length} / 47</div><p>訪問した都道府県</p><p class="muted" style="color:#cbd5e1">タップして旅を記録。緑＝訪問済み、黄＝TODOあり。</p></div>
