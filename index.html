@@ -402,9 +402,81 @@ function renderMap(a){
  <div class="card"><h3>旅の進捗</h3><div class="grid">${P.map(p=>`<button class="secondary" onclick="openPref('${p[1]}')">${p[0]} ${visited(p[1])?"✓":""}</button>`).join("")}</div></div>`;
 }
 function renderTodo(a){
- let items=[];P.forEach(p=>info(p[1]).todos.forEach((t,i)=>items.push({p,i,t,k:p[1]})));
- a.innerHTML=`<h2>TODORIST</h2><p class="muted">「訪問済み＝完了」ではなく、また行きたい場所・やりたいことを残します。</p>
- <div class="card">${items.map(x=>`<div class="todoitem"><input type="checkbox" ${x.t.done?"checked":""} onchange="toggleTodo('${x.k}',${x.i})"><span style="flex:1"><b>${x.p[0]}</b>　${esc(x.t.text)}</span><button class="secondary" onclick="openPref('${x.k}')">県へ</button></div>`).join("")||"<p>TODOはまだありません。MAPから追加できます。</p>"}</div>`;
+  let items=[];
+
+  P.forEach(p=>{
+    info(p[1]).todos.forEach((t,i)=>{
+      items.push({
+        p,
+        i,
+        t,
+        k:p[1]
+      });
+    });
+  });
+
+  const active=items.filter(x=>!x.t.done);
+  const done=items.filter(x=>x.t.done);
+
+  a.innerHTML=`
+    <h2>TODORIST</h2>
+    <p class="muted">
+      「訪問済み＝完了」ではなく、また行きたい場所・やりたいことを残します。
+    </p>
+
+    <div class="card">
+      <h3>⭐ まだ行ってない</h3>
+
+      ${
+        active.map(x=>`
+          <div class="todoitem">
+            <input
+              type="checkbox"
+              onchange="toggleTodo('${x.k}',${x.i})"
+            >
+
+            <span style="flex:1">
+              <b>${x.p[0]}</b>　${esc(x.t.text)}
+            </span>
+
+            <button
+              class="secondary"
+              onclick="openPref('${x.k}')">
+              県へ
+            </button>
+          </div>
+        `).join("")
+        || "<p class='muted'>まだありません。</p>"
+      }
+    </div>
+
+    <div class="card">
+      <h3>✅ 完了した場所・やりたいこと</h3>
+
+      ${
+        done.map(x=>`
+          <div class="todoitem">
+            <input
+              type="checkbox"
+              checked
+              onchange="toggleTodo('${x.k}',${x.i})"
+            >
+
+            <span style="flex:1;text-decoration:line-through;color:#999">
+              <b>${x.p[0]}</b>　${esc(x.t.text)}
+            </span>
+
+            <button
+              class="secondary"
+              onclick="openPref('${x.k}')">
+              県へ
+            </button>
+          </div>
+        `).join("")
+        || "<p class='muted'>まだありません。</p>"
+      }
+    </div>
+  `;
 }
 function allMedia(){let a=[];P.forEach(p=>info(p[1]).media.forEach(m=>a.push({...m,p:p[0]})));return a}
 function renderAlbum(a){let ms=allMedia();a.innerHTML=`<h2>ALBUM</h2><p class="muted">${ms.length}件のメディア</p><div class="media card">${ms.map(m=>m.type.startsWith("video")?`<video controls src="${m.data}"></video>`:`<img src="${m.data}" title="${m.p}">`).join("")||"<p>まだ写真・動画がありません。各県ページから追加できます。</p>"}</div>`}
